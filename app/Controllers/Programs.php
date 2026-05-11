@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\ProgramModel;
+use App\Models\BookmarkModel;
 
 class Program extends BaseController
 {
@@ -67,5 +68,27 @@ class Program extends BaseController
     {
         $this->model->delete($id);
         return redirect()->to('/program');
+    }
+
+    public function saveProgram($id)
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        $bookmarkModel = new \App\Models\BookmarkModel();
+        $already = $bookmarkModel
+            ->where('user_id', session()->get('user_id'))
+            ->where('program_id', $id)
+            ->first();
+
+        if (!$already) {
+            $bookmarkModel->save([
+                'user_id' => session()->get('user_id'),
+                'program_id' => $id
+            ]);
+        }
+
+        return redirect()->back();
     }
 }

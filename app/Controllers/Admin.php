@@ -7,12 +7,26 @@ use App\Models\ProgramModel;
 
 class Admin extends BaseController
 {
+    public function __construct()
+    {
+        if (
+            !session()->get('logged_in') ||
+            session()->get('role') != 'admin'
+        ) {
+            exit('Akses ditolak');
+        }
+    }
+
     public function index()
     {
         return view('admin/index');
     }
 
-    // ================= USERS =================
+    /*
+    =========================
+    LOAD USERS
+    =========================
+    */
 
     public function users()
     {
@@ -22,8 +36,14 @@ class Admin extends BaseController
             ->where('status', 'pending')
             ->findAll();
 
-        return view('admin/users', $data);
+        return view('admin/users_content', $data);
     }
+
+    /*
+    =========================
+    APPROVE USER
+    =========================
+    */
 
     public function approveUser($id)
     {
@@ -33,10 +53,14 @@ class Admin extends BaseController
             'status' => 'approved'
         ]);
 
-        return redirect()->to('/admin/users');
+        return redirect()->to('/admin');
     }
 
-    // ================= PROGRAMS =================
+    /*
+    =========================
+    LOAD PROGRAMS
+    =========================
+    */
 
     public function programs()
     {
@@ -46,8 +70,14 @@ class Admin extends BaseController
             ->where('status', 'pending')
             ->findAll();
 
-        return view('admin/programs', $data);
+        return view('admin/programs_content', $data);
     }
+
+    /*
+    =========================
+    APPROVE PROGRAM
+    =========================
+    */
 
     public function approveProgram($id)
     {
@@ -57,6 +87,6 @@ class Admin extends BaseController
             'status' => 'approved'
         ]);
 
-        return redirect()->to('/admin/programs');
+        return redirect()->to('/admin');
     }
 }

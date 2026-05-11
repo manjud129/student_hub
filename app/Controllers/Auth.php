@@ -15,19 +15,17 @@ class Auth extends BaseController
     {
         $model = new UserModel();
 
-       $model->save([
-    'username' => $this->request->getPost('username'),
-
-    'email' => $this->request->getPost('email'),
-
-    'password' => password_hash(
-        $this->request->getPost('password'),
-        PASSWORD_DEFAULT
-    ),
-
-    'status' => 'pending'
-]);
-        return redirect()->to('/login');
+        $model->save([
+            'username' => $this->request->getPost('username'),
+            'email' => $this->request->getPost('email'),
+            'password' => password_hash(
+                $this->request->getPost('password'),
+                PASSWORD_DEFAULT
+            ),
+            'role' => 'user',
+            'status' => 'pending'
+        ]);
+        return redirect()->to('/login')->with('success', 'Registrasi berhasil! Tunggu approval admin.');
     }
 
     public function login()
@@ -38,7 +36,6 @@ class Auth extends BaseController
     public function processLogin()
     {
         $session = session();
-
         $model = new UserModel();
 
         $user = $model->where(
@@ -46,31 +43,34 @@ class Auth extends BaseController
             $this->request->getPost('email')
         )->first();
 
-      if ($user) {
+        if ($user) {
+            if ($user['status'] != 'approved') {
+                return redirect()->back()->with(
+                    'error',
+                    'Akun anda belum disetujui admin'
+                );
+            }
 
-    if ($user['status'] != 'approved') {
+            if (
+                password_verify(
+                    $this->request->getPost('password'),
+                    $user['password']
+                )
+            ) {
+                $session->set([
+                    'user_id' => $user['id'],
+                    'username' => $user['username'],
+                    'role' => $user['role'],
+                    'logged_in' => true
+                ]);
 
-        return redirect()->back()->with(
-            'error',
-            'Akun anda belum disetujui admin'
-        );
-    }
+                if ($user['role'] == 'admin') {
+                    return redirect()->to('/admin');
+                }
 
-    if (password_verify(
-        $this->request->getPost('password'),
-        $user['password']
-    )) {
-
-        $session->set([
-            'user_id' => $user['id'],
-            'username' => $user['username'],
-            'role' => $user['role'],
-            'logged_in' => true
-        ]);
-
-        return redirect()->to('/');
-    }
-}
+                return redirect()->to('/')->with('success', 'Login berhasil!');
+            }
+        }
 
         return redirect()->back()->with(
             'error',
@@ -78,10 +78,10 @@ class Auth extends BaseController
         );
     }
 
+    // ========== LOGOUT - LANGSUNG KE GUEST HOME ==========
     public function logout()
     {
         session()->destroy();
-
-        return redirect()->to('/login');
+        return redirect()->to('/')->with('success', '✅ Logout berhasil! Selamat datang kembali di Student Hub.');
     }
 }

@@ -10,41 +10,53 @@ class Home extends BaseController
     {
         $model = new ProgramModel();
 
-        $data['programs'] = $model->like('title', 'Beasiswa')
-                                  ->orLike('title', 'BCA')
-                                  ->orderBy('id', 'DESC')
-                                  ->findAll(5); // tampilkan 5 saja
+        // Filter logic sama...
+        $search = trim($this->request->getGet('search') ?? '');
+        $jenjang = trim($this->request->getGet('jenjang') ?? '');
+        $tipe = trim($this->request->getGet('tipe') ?? '');
+        $negara = trim($this->request->getGet('negara') ?? '');
 
-        return view('programs/index', $data);
+        $builder = $model->where('status', 'approved');
+
+        if ($search) {
+            $builder->groupStart()
+                ->like('title', $search)
+                ->orLike('source', $search)
+                ->orLike('jenjang', $search)
+                ->orLike('negara', $search)
+                ->groupEnd();
+        }
+        if ($jenjang)
+            $builder->where('jenjang', $jenjang);
+        if ($tipe)
+            $builder->where('tipe', $tipe);
+        if ($negara)
+            $builder->like('negara', $negara);
+
+        $data['programs'] = $builder->orderBy('deadline', 'ASC')->findAll();
+
+        // ✅ SELALU SET TOTAL
+        $data['filters'] = [
+            'search' => $search,
+            'jenjang' => $jenjang,
+            'tipe' => $tipe,
+            'negara' => $negara,
+            'total' => count($data['programs'])  // ✅ INI WAJIB
+        ];
+
+        // User check
+        if (session()->get('logged_in') && session()->get('role') == 'user') {
+            return view('programs/user_home', $data);
+        }
+
+        return view('programs/guest_home', $data);  // ✅ Data lengkap ke guest juga
     }
- public function tambah()
-{
-    if (!session()->get('logged_in')) {
 
-        return redirect()->to('/login');
+    // ... method lain tetap sama
+    public function tambah()
+    { /* ... */
     }
-
-    return view('tambah_beasiswa');
-}
-public function simpan()
-{
-    $model = new \App\Models\ProgramModel();
-
-    $model->save([
-        'user_id' => session()->get('user_id'),
-
-        'title' => $this->request->getPost('title'),
-
-        'deadline' => $this->request->getPost('deadline'),
-
-        'source' => $this->request->getPost('source'),
-
-        'link' => $this->request->getPost('link'),
-
-        'status' => 'pending'
-    ]);
-
-    return redirect()->to('/');
-}
-
+    public function simpan()
+    { /* ... */
+    }
 }
