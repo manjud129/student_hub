@@ -3,105 +3,85 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Login - Student Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        background: '#070B14',
+                        surface: '#0F1523',
+                        borderColor: '#1E293B',
+                        primary: '#6366F1',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root{
-            --bg:#0b1220;
-            --card:#0f1a31;
-            --text:#e6eefc;
-            --muted:#a8b3cf;
-            --primary:#6d28d9;
-            --primary-2:#8b5cf6;
-            --border:rgba(255,255,255,.12);
-            --danger:#ef4444;
+        body {
+            background-color: #070B14;
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
         }
-        *{box-sizing:border-box}
-        body{
-            margin:0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(180deg, #0b1220 0%, #0a1020 50%, #070c17 100%);
-            color:var(--text);
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:20px;
-        }
-        .card{
-            width:100%;
-            max-width:430px;
-            background: rgba(15,26,49,.7);
-            border:1px solid var(--border);
-            border-radius:16px;
-            padding:20px;
-            box-shadow: 0 16px 50px rgba(0,0,0,.35);
-        }
-        .title{margin:0 0 6px; font-size:22px}
-        .subtitle{margin:0 0 16px; color:var(--muted); font-size:13px; line-height:1.4}
-        .field{margin-bottom:12px}
-        label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
-        input{
-            width:100%;
-            padding:11px 12px;
-            border-radius:12px;
-            border:1px solid var(--border);
-            background: rgba(255,255,255,.03);
-            color:var(--text);
-            outline:none;
-        }
-        input:focus{border-color: rgba(139,92,246,.6); box-shadow: 0 0 0 4px rgba(139,92,246,.15)}
-        .error{
-            padding:10px 12px;
-            border-radius:12px;
-            margin-bottom:14px;
-            border:1px solid rgba(239,68,68,.35);
-            background: rgba(239,68,68,.12);
-            color: #fecaca;
-            font-size:13px;
-        }
-        button{
-            width:100%;
-            padding:12px;
-            border:none;
-            border-radius:12px;
-            background: linear-gradient(180deg, rgba(139,92,246,.95), rgba(109,40,217,.95));
-            color:white;
-            font-weight:800;
-            cursor:pointer;
-        }
-        button:hover{filter:brightness(1.05)}
-        .row{display:flex; justify-content:space-between; gap:12px; align-items:center; margin-top:14px;}
-        .link{color:var(--muted); text-decoration:none; font-size:13px}
-        .link:hover{color:var(--text)}
-        @media (prefers-reduced-motion: reduce){*{transition:none !important}}
     </style>
 </head>
-<body>
-    <div class="card">
-        <?php if(session()->getFlashdata('error')) : ?>
-            <div class="error"><?= session()->getFlashdata('error') ?></div>
-        <?php endif; ?>
+<body class="text-slate-300 antialiased min-h-screen flex items-center justify-center p-6">
 
-        <h1 class="title">Login</h1>
-        <p class="subtitle">Masuk untuk mengelola beasiswa dan akun Anda.</p>
-
-        <form action="/process-login" method="post">
-            <div class="field">
-                <label for="email">Email</label>
-                <input id="email" type="email" name="email" required placeholder="nama@email.com" />
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="flex flex-col items-center mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4">
+                <i data-lucide="graduation-cap" class="text-white w-7 h-7"></i>
             </div>
+            <h1 class="text-2xl font-bold text-white">Selamat Datang</h1>
+            <p class="text-slate-400 mt-2 text-center text-sm">Masuk untuk mengelola beasiswa dan akun Anda.</p>
+        </div>
 
-            <div class="field">
-                <label for="password">Password</label>
-                <input id="password" type="password" name="password" required placeholder="••••••••" />
+        <div class="bg-surface border border-borderColor p-8 rounded-3xl shadow-xl">
+            <?php if(session()->getFlashdata('error')) : ?>
+                <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm">
+                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                    <?= session()->getFlashdata('error') ?>
+                </div>
+            <?php endif; ?>
+
+            <form action="/process-login" method="post" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Email</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                        <input type="email" name="email" required placeholder="nama@email.com" 
+                            class="w-full pl-10 pr-4 py-3 bg-background border border-borderColor rounded-xl text-white focus:outline-none focus:border-primary transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Password</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                        <input type="password" name="password" required placeholder="••••••••" 
+                            class="w-full pl-10 pr-4 py-3 bg-background border border-borderColor rounded-xl text-white focus:outline-none focus:border-primary transition-all">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-primary hover:bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                    Masuk Sekarang
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-borderColor flex flex-col gap-4 items-center">
+                <a href="/register" class="text-sm font-medium text-indigo-400 hover:text-indigo-300">Belum punya akun? Daftar gratis</a>
+                <a href="/" class="text-xs text-slate-500 hover:text-white transition-colors flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-3 h-3"></i> Kembali ke Beranda
+                </a>
             </div>
-
-            <button type="submit">Login</button>
-
-            <div class="row">
-                <a class="link" href="/register">Belum punya akun? Register</a>
-            </div>
-        </form>
+        </div>
     </div>
+
+    <script>lucide.createIcons();</script>
 </body>
 </html>
